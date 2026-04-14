@@ -39,5 +39,27 @@ module functions
     end do  
   end function Magnet
 
+  recursive function find(x,parent) result(out)
+    integer(i4), intent(in) :: x
+    integer(i4), intent(inout) :: parent(:)
+    integer(i4) :: out
+    if(parent(x) /= x) then
+      out=find(parent(x),parent )
+    else
+      out=x
+    end if
+  end function find
+
+  subroutine union(x,y,parent)
+    integer(i4),intent(in) :: x,y
+    integer(i4),intent(inout) :: parent(:)
+    integer :: root_x, root_y
+    root_x=find(x,parent)
+    root_y=find(y,parent)
+    if (root_x /= root_y) then
+      parent(root_y)=root_x
+    end if
+  end subroutine union
+
 
 end module functions

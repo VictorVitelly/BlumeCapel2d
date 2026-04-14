@@ -14,12 +14,13 @@ contains
   open(1, file = 'data/therm.dat', status = 'replace')
     call init_probabilities(T0,D0)
     !call hot_start(spin)
-    spin=1
+    spin=0
     do i=1,thermalization
       if(i==1 .or. mod(i,2)==0 ) then
         write(1,*) i, Hamilt(spin,D0)/(real(L**2,dp) ), Magnet(spin)/real(L**2,dp)
       end if
       call heat_bath(spin)  
+      call cluster(spin,T0,D0)
     end do
   close(1)
   end subroutine thermalize
@@ -51,6 +52,7 @@ contains
       do i3=1,Nmsrs
         do i4=1,eachsweep
           call heat_bath(spin)
+          call cluster(spin,T0,D0)
         end do
         MM=Magnet(spin)
         EE=Hamilt(spin,D0)

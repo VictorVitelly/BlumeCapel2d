@@ -12,7 +12,7 @@ program main
   call init_vecs()
 
   !call thermalize(0.1_dp,1.9_dp)
-  call vary_T(0.23_dp,0.8_dp,1.95_dp,20)
+  call vary_T(0.145_dp,1.0_dp,1.95_dp,20)
   call cpu_time(ending)
   write(*,*) "Elapsed time: ", (ending-starting), " s"
 

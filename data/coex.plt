@@ -48,9 +48,10 @@ set multiplot layout 2,2
         set ylabel 'C_V' font ',24' rotate by 0 offset -6,0
         plot for [i=1:4] 'coexistence/hea2.dat' u column1[i]:column2[i]:column3[i] w errorbars linestyle i title tit[i]
         
-        set logscale y
-        set format y "10^{%L}"
+        #set logscale y
+        #set format y "10^{%L}"
         set key bottom right
+        set xrange [0.3:1]
         set title 'Susceptibility' font ',24'
         set ylabel 'χ_M' font ',24' rotate by 0 offset -6,0
         plot for [i=1:4] 'coexistence/sus2.dat' u column1[i]:column2[i]:column3[i] w errorbars linestyle i title tit[i]

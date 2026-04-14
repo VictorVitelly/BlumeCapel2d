@@ -50,7 +50,101 @@ contains
     end do
   end subroutine heat_bath
 
-  
+  subroutine cluster(spin,T,D)
+    real(dp),intent(in) :: T,D
+    integer(i4), dimension(L,L),intent(inout) :: spin
+    logical, dimension(L,L) :: bond_x,bond_y
+    integer(i4) :: i,j,label(L,L),parent(L*L),next_label,left_label,up_label
+    logical, allocatable :: flip_cluster(:)
+    real(dp) :: r,p
+
+    do i=1,L
+      do j=1,L
+        if(spin(i,j)==spin(mod(i,L)+1,j) .and. (spin(i,j).ne.0) ) then
+          p=1._dp-exp(-2._dp/T )
+          call random_number(r)
+          bond_x(i,j)=(r<p)
+        else
+          bond_x(i,j)=.false.
+        end if
+        if(spin(i,j)==spin(i,mod(j,L)+1) .and. (spin(i,j).ne.0) ) then
+          p=1._dp-exp(-2._dp/T )
+          call random_number(r)
+          bond_y(i,j)=(r<p)
+        else
+          bond_y(i,j)=.false.
+        end if
+      end do
+    end do
+
+    label(:,:)=0
+    do i=1,L*L
+      parent(i)=i
+    end do
+    next_label=1
+    left_label=0
+    up_label=0
+
+    do i=1,L
+      do j=1,L
+        left_label=0
+        up_label=0
+        if(i>1 .and. bond_x(i-1,j) ) then
+          left_label=label(i-1,j)
+        end if
+        if(j>1 .and. bond_y(i,j-1) ) then
+          up_label=label(i,j-1)
+        end if
+        if(left_label==0 .and. up_label==0) then
+          label(i,j)=next_label
+          next_label=next_label+1
+        else if(left_label /= 0 .and. up_label==0) then
+          label(i,j)=left_label
+        else if(left_label== 0 .and. up_label/=0) then
+          label(i,j)=up_label
+        else
+          label(i,j)=min(left_label,up_label)
+          call union(left_label,up_label,parent)
+        end if
+      end do
+    end do
+
+    do j=1,L
+      if(bond_x(L,j) ) then
+        call union(label(1,j),label(L,j),parent )
+      end if
+    end do
+
+    do i=1,L
+      if(bond_y(i,L) ) then
+        call union(label(i,1),label(i,L),parent )
+      end if
+    end do
+
+    do i=1,L
+      do j=1,L
+        label(i,j)=find(label(i,j),parent)
+      end do
+    end do
+
+    allocate(flip_cluster(next_label) )
+    flip_cluster(:)=.false.
+
+    do i=1,next_label-1
+      call random_number(r)
+      flip_cluster(i)=(r<0.5_dp)
+    end do
+    do i=1,L
+      do j=1,L
+        if(flip_cluster(label(i,j))) then
+          spin(i,j)=-spin(i,j)
+        end if
+      end do
+    end do
+
+  end subroutine cluster
+
+  !ERROR STATISTICS
   subroutine standard_error(x,y,deltay)
     real(dp), dimension(:), intent(in) :: x
     real(dp), intent(in) :: y
