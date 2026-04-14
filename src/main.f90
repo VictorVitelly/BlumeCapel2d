@@ -5,14 +5,14 @@ program main
   use arrays
   use functions
   use statistics
+  use measurements
   implicit none
 
   call cpu_time(starting)
   call init_vecs()
-  call hot_start(spin)
-  call init_probabilities(1._dp)
-  write(*,*) spin
-  call heat_bath(spin)
+
+  !call thermalize(0.1_dp,1.9_dp)
+  call vary_T(0.23_dp,0.8_dp,1.95_dp,20)
   call cpu_time(ending)
   write(*,*) "Elapsed time: ", (ending-starting), " s"
 
